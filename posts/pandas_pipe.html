@@ -110,7 +110,7 @@ df = json_normalize(data, 'counties', ['state', 'shortname',
                                            ['info', 'governor']])
 </code></pre>
 
-            <p>To update the columns of the Pandas. Either ways are equivalent.</p>
+            <p>To update the columns of the Pandas, either ways below are equivalent.</p>
 
 <pre><code class="language-python">df['some_new_col1'] = df['state'].map(lambda e: e)
 
@@ -124,7 +124,7 @@ df['some_new_col2'] = df.apply(lambda e: e['state'])
 
             <h2 class="section-heading">Processing Data in Pipeline Style</h2>
 
-            <p>In traditional machine applications such as face recognition have different steps. First apply face calibration methods, then extract the features and then train the classifiers. Finally release into production usage. These can be viewed as the sequence of transformation over the faces data.</p>
+            <p>In traditional machine applications, such as face recognition, it is consisting of serveral steps. First apply face calibration methods, then extract the features and then train the classifiers. Finally turn the data model into production usage. These can be viewed as the sequence of transformation over the faces data.</p>
 
             <p>Express this in a abstract way, this can be viewed as the following.</p>
 <pre><code class="language-python">f(g(h(df), arg1=a), arg2=b, arg3=c)
