@@ -88,35 +88,105 @@
             <p>For the first question, we will always assume that the data to be processed is in table-like format. In the early stage of machine learning applications, data proceesing can always be categried into two types. <br>One is extract feature columns from existed feature columns, the other is doing aggregatition on existed feature columns based on certain metrics. All in all, these two are column-based. The data processing framework should support column excuation. <br>Data pipeline is a seqence of transformation function excuting on the data, the previous excuter's output is the successive's input.<br>For the last question, we can mimic MapReduce to processing the data in a data parallel style with multiprocessing.</p>
 
             <h2 class="section-heading">Pandas - a Short Introduction</h2>
+            <p>Here we will use pandas to process our data. In a enterprise, we usually deal a lot with json data. First let us start to generate some sample data:</p>
+<pre><code class="language-python">data = [{'state': 'Florida',
+         'shortname': 'FL',
+         'info': {
+             'governor': 'Rick Scott'
+         },
+         'counties': [{'name': 'Dade', 'population': 12345},
+                      {'name': 'Broward', 'population': 40000},
+                      {'name': 'Palm Beach', 'population': 60000}]},
+        {'state': 'Ohio',
+         'shortname': 'OH',
+         'info': {
+             'governor': 'John Kasich'
+         },
+         'counties': [{'name': 'Summit', 'population': 1234},
+                      {'name': 'Cuyahoga', 'population': 1337}]}]
+from pandas.io.json import json_normalize
 
-            <p>There can be no thought of finishing for ‘aiming for the stars.’ Both figuratively and literally, it is a task to occupy the generations. And no matter how much progress one makes, there is always the thrill of just beginning.</p>
+df = json_normalize(data, 'counties', ['state', 'shortname',
+                                           ['info', 'governor']])
+</code></pre>
 
-            <p>There can be no thought of finishing for ‘aiming for the stars.’ Both figuratively and literally, it is a task to occupy the generations. And no matter how much progress one makes, there is always the thrill of just beginning.</p>
+            <p>To update the columns of the Pandas. Either ways are equivalent.</p>
 
-            <blockquote class="blockquote">The dreams of yesterday are the hopes of today and the reality of tomorrow. Science has not yet mastered prophecy. We predict too much for the next year and yet far too little for the next ten.</blockquote>
+<pre><code class="language-python">df['some_new_col1'] = df['state'].map(lambda e: e)
 
-            <p>Spaceflights cannot be stopped. This is not the work of any one man or even a group of men. It is a historical process which mankind is carrying out in accordance with the natural laws of human development.</p>
+df['some_new_col2'] = df.apply(lambda e: e['state'])
+</code></pre>
+
+            <p>Sometimes the new features may be depended on serveral other columns.</p>
+
+<pre><code class="language-python">df['some_new_col3'] = df[['state', 'name']].map(lambda e: " ".join(e))
+</code></pre>
 
             <h2 class="section-heading">Processing Data in Pipeline Style</h2>
 
-            <p>As we got further and further away, it [the Earth] diminished in size. Finally it shrank to the size of a marble, the most beautiful you can imagine. That beautiful, warm, living object looked so fragile, so delicate, that if you touched it with a finger it would crumble and fall apart. Seeing this has to change a man.</p>
+            <p>In traditional machine applications such as face recognition have different steps. First apply face calibration methods, then extract the features and then train the classifiers. Finally release into production usage. These can be viewed as the sequence of transformation over the faces data.</p>
 
-            <a href="#">
-              <img class="img-fluid" src="../img/post-sample-image.jpg" alt="">
-            </a>
-            <span class="caption text-muted">To go places and do things that have never been done before – that’s what living is all about.</span>
+            <p>Express this in a abstract way, this can be viewed as the following.</p>
+<pre><code class="language-python">f(g(h(df), arg1=a), arg2=b, arg3=c)
+</code></pre>
 
-            <p>Space, the final frontier. These are the voyages of the Starship Enterprise. Its five-year mission: to explore strange new worlds, to seek out new life and new civilizations, to boldly go where no man has gone before.</p>
+            <p>But it looks rather awkward, thanks to Pandas built-in pipe method, we can simply write code as following.</p>
+<pre><code class="language-python">df.pipe(h) \
+  .pipe(g, arg1=a) \
+  .pipe(f, arg2=b, arg3=c)
+</code></pre>
 
-            <p>As I stand out here in the wonders of the unknown at Hadley, I sort of realize there’s a fundamental truth to our nature, Man must explore, and this is exploration at its greatest.</p>
+            <p>The f, g, h refered above can be functions, lambda expression or even class. In a lot of application I developed, I am in favor of class. Because it can offer more flexibility in controlling the behavior of the operators in the pipeline. But how can a class work like a function? That is Simple, use the Python magic function.</p>
 
-            <p>Placeholder text by
-              <a href="http://spaceipsum.com/">Space Ipsum</a>. Photographs by
-              <a href="https://www.flickr.com/photos/nasacommons/">NASA on The Commons</a>.</p>
+<pre><code class="language-python">class SomeMagicFunction: \
+      def __init__(self, *args, **kwargs):
+            self.args = args
+            self.kwargs = kwargs
+
+      def __call__(self, *args, **kwargs):
+            print("do some thing magic with {} and {}".format(self.args, self.kwargs))
+</code></pre>
+
+            <p>A more realistic one is like the following.</p>
+ <pre><code class="language-python">df.pipe(DimensionReduction('iso', to_col='dimension_reduced'), conf=conf, status=status) \
+  .pipe(RiskScoreCalculator("knn", from_col='dimension_reduced', to_col='abnormal_score'), conf=conf, status=status) \
+  .pipe(NormalizeAbnormalScore(from_col='abnormal_score', to_col='abnormal_score_normalize'), conf=conf, status=status) \
+  .pipe(UpdateLabel(0), conf=conf, status=status) \
+  .pipe(UpdateDescription(0), conf=conf, status=status) \
+  .pipe(UpdateToRedis(start_time, end_time), conf=conf, status=status) \
+  .pipe(UpdateImportance(data_manager.current_batch_json), conf=conf, status=status) \
+  .pipe(UpdateToES(data_manager.current_batch_json), conf=conf, status=status)
+</code></pre>           
+            <p>DimensionReduction, RiskScoreCalculator, NormalizeAbnormalScore, UpdateLabel, UpdateDescription will apply new columns to the dataframe according to its own function. UpdateToRedis, UpdateImportance, UpdateToES will update the enriched result into databases for downstream systems to process the data. The conf and status is dictionary value in python. We assume that conf should never be applied with write methods, and each operator in the pipeline can only write small amount of data in status as a message queue. This actually uses Python dictionary side effect(dictionary is passed by reference not value) and should be taken carefully.</p>
 
             <h2 class="section-heading">Scale to Large Dataset</h2>
 
-            <p>As we got further and further away, it [the Earth] diminished in size. Finally it shrank to the size of a marble, the most beautiful you can imagine. That beautiful, warm, living object looked so fragile, so delicate, that if you touched it with a finger it would crumble and fall apart. Seeing this has to change a man.</p>
+            <p>At last, we nearly come to the end of pipeline processing. Still if the dataset is large, how can we deal with it? I guess someone experienced will say <a href="https://github.com/dask/dask/">Dask</a> is what you neeed. Actually, we can still use Pandas but in a parallel manner.</p>
+
+            <p>Parallel computing can be categorised into three kinds: data parallel, task parallel and mixed mode.
+            For processing the dataframe, it is obvious that data parallel should be easy. By applying MapReduce methodology, data can be chunked into pieces and processed seperatedly and combine these together. We only need to implement column based enrichment operation and parallel aggregate. These are mostly needed.</p>
+
+ <pre><code class="language-python">import multiprocessing as mp
+
+def parallel_runner(fn, *args, **kwargs):
+    data = args[0]
+    data_chunks = split_strategy(data)(data)
+    with mp.Pool() as pool:
+        results = pool.starmap(partial(fn, **kwargs),
+                               ((i,) + args[1:] for i in data_chunks))
+    return pd.concat(results).reset_index(drop=True)
+</code></pre>  
+
+            <p>The split_strategy is ignored here. It can be customised with fixed size of fixed chunk count etc. partial function is used here, acting as some kind of trick, as the starmap does not support kwargs. The first argument in the args is supposed to be the dataframe to be processed. And the parallel aggregatition is as following, the reader should not be much supprised:</p>
+
+ <pre><code class="language-python">def parallel_aggregate(dfGrouped, func):
+    with mp.Pool() as pool:
+        ret_list = pool.starmap(func, ((name, group) for name, group in dfGrouped))
+    return pd.concat(ret_list)
+</code></pre>  
+
+            <p>Hopefully, from this blog, data pipeline designing is cleard and simplified with Pandas.</p>
+
           </div>
         </div>
       </div>
