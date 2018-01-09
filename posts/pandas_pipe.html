@@ -177,7 +177,7 @@ def parallel_runner(fn, *args, **kwargs):
     return pd.concat(results).reset_index(drop=True)
 </code></pre>  
 
-            <p>The split_strategy is ignored here. It can be customised with fixed size of fixed chunk count etc. partial function is used here, acting as some kind of trick, as the starmap does not support kwargs. The first argument in the args is supposed to be the dataframe to be processed. And the parallel aggregatition is as following, the reader should not be much supprised:</p>
+            <p>The split_strategy is ignored here. It can be customised with fixed size or fixed chunk count etc. partial function is used here, acting as some kind of trick, as the starmap does not support kwargs. The first argument in the args is supposed to be the dataframe to be processed. And the parallel aggregatition is as following, the reader should not be much supprised:</p>
 
  <pre><code class="language-python">def parallel_aggregate(dfGrouped, func):
     with mp.Pool() as pool:
