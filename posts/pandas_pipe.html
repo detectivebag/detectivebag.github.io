@@ -167,6 +167,7 @@ df['some_new_col2'] = df.apply(lambda e: e['state'])
             For processing the dataframe, it is obvious that data parallel should be easy. By applying MapReduce methodology, data can be chunked into pieces and processed seperatedly and combine these together. We only need to implement column based enrichment operation and parallel aggregate. These are mostly needed.</p>
 
  <pre><code class="language-python">import multiprocessing as mp
+import pandas as pd
 
 def parallel_runner(fn, *args, **kwargs):
     data = args[0]
@@ -177,7 +178,7 @@ def parallel_runner(fn, *args, **kwargs):
     return pd.concat(results).reset_index(drop=True)
 </code></pre>  
 
-            <p>The split_strategy is ignored here. It can be customised with fixed size or fixed chunk count etc. partial function is used here, acting as some kind of trick, as the starmap does not support kwargs. The first argument in the args is supposed to be the dataframe to be processed. And the parallel aggregatition is as following, the reader should not be much supprised:</p>
+            <p>The split_strategy is ignored here. It can be customised with fixed size or fixed chunk count etc. Partial function is used here, acting as some kind of trick, as the <b>starmap</b> function of multiprocessing pool does not support key word arguments. The first argument of the parameter <b>args</b> should always be the dataframe to be processed. And the parallel aggregatition is as following, the reader should not be much supprised. The dfGrouped is grouped-by object of the processed dataframe.</p>
 
  <pre><code class="language-python">def parallel_aggregate(dfGrouped, func):
     with mp.Pool() as pool:
