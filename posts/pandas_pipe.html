@@ -89,74 +89,84 @@
 
             <h2 class="section-heading">Pandas - a Short Introduction</h2>
             <p>Here we will use pandas to process our data. In a enterprise, we usually deal a lot with json data. First let us start to generate some sample data:</p>
-<pre><code class="language-python">data = [{'state': 'Florida',
-         'shortname': 'FL',
-         'info': {
-             'governor': 'Rick Scott'
-         },
-         'counties': [{'name': 'Dade', 'population': 12345},
-                      {'name': 'Broward', 'population': 40000},
-                      {'name': 'Palm Beach', 'population': 60000}]},
-        {'state': 'Ohio',
-         'shortname': 'OH',
-         'info': {
-             'governor': 'John Kasich'
-         },
-         'counties': [{'name': 'Summit', 'population': 1234},
-                      {'name': 'Cuyahoga', 'population': 1337}]}]
-from pandas.io.json import json_normalize
 
-df = json_normalize(data, 'counties', ['state', 'shortname',
-                                           ['info', 'governor']])
-</code></pre>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">data <span style="color: #333333">=</span> [{<span style="background-color: #fff0f0">&#39;state&#39;</span>: <span style="background-color: #fff0f0">&#39;Florida&#39;</span>,
+         <span style="background-color: #fff0f0">&#39;shortname&#39;</span>: <span style="background-color: #fff0f0">&#39;FL&#39;</span>,
+         <span style="background-color: #fff0f0">&#39;info&#39;</span>: {
+             <span style="background-color: #fff0f0">&#39;governor&#39;</span>: <span style="background-color: #fff0f0">&#39;Rick Scott&#39;</span>
+         },
+         <span style="background-color: #fff0f0">&#39;counties&#39;</span>: [{<span style="background-color: #fff0f0">&#39;name&#39;</span>: <span style="background-color: #fff0f0">&#39;Dade&#39;</span>, <span style="background-color: #fff0f0">&#39;population&#39;</span>: <span style="color: #0000DD; font-weight: bold">12345</span>},
+                      {<span style="background-color: #fff0f0">&#39;name&#39;</span>: <span style="background-color: #fff0f0">&#39;Broward&#39;</span>, <span style="background-color: #fff0f0">&#39;population&#39;</span>: <span style="color: #0000DD; font-weight: bold">40000</span>},
+                      {<span style="background-color: #fff0f0">&#39;name&#39;</span>: <span style="background-color: #fff0f0">&#39;Palm Beach&#39;</span>, <span style="background-color: #fff0f0">&#39;population&#39;</span>: <span style="color: #0000DD; font-weight: bold">60000</span>}]},
+        {<span style="background-color: #fff0f0">&#39;state&#39;</span>: <span style="background-color: #fff0f0">&#39;Ohio&#39;</span>,
+         <span style="background-color: #fff0f0">&#39;shortname&#39;</span>: <span style="background-color: #fff0f0">&#39;OH&#39;</span>,
+         <span style="background-color: #fff0f0">&#39;info&#39;</span>: {
+             <span style="background-color: #fff0f0">&#39;governor&#39;</span>: <span style="background-color: #fff0f0">&#39;John Kasich&#39;</span>
+         },
+         <span style="background-color: #fff0f0">&#39;counties&#39;</span>: [{<span style="background-color: #fff0f0">&#39;name&#39;</span>: <span style="background-color: #fff0f0">&#39;Summit&#39;</span>, <span style="background-color: #fff0f0">&#39;population&#39;</span>: <span style="color: #0000DD; font-weight: bold">1234</span>},
+                      {<span style="background-color: #fff0f0">&#39;name&#39;</span>: <span style="background-color: #fff0f0">&#39;Cuyahoga&#39;</span>, <span style="background-color: #fff0f0">&#39;population&#39;</span>: <span style="color: #0000DD; font-weight: bold">1337</span>}]}]
+<span style="color: #008800; font-weight: bold">from</span> <span style="color: #0e84b5; font-weight: bold">pandas.io.json</span> <span style="color: #008800; font-weight: bold">import</span> json_normalize
+
+df <span style="color: #333333">=</span> json_normalize(data, <span style="background-color: #fff0f0">&#39;counties&#39;</span>, [<span style="background-color: #fff0f0">&#39;state&#39;</span>, <span style="background-color: #fff0f0">&#39;shortname&#39;</span>,
+                                           [<span style="background-color: #fff0f0">&#39;info&#39;</span>, <span style="background-color: #fff0f0">&#39;governor&#39;</span>]])
+</pre></div>
 
             <p>To update the columns of the Pandas, either ways below are equivalent.</p>
 
-<pre><code class="language-python">df['some_new_col1'] = df['state'].map(lambda e: e)
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">df[<span style="background-color: #fff0f0">&#39;some_new_col1&#39;</span>] <span style="color: #333333">=</span> df[<span style="background-color: #fff0f0">&#39;state&#39;</span>]<span style="color: #333333">.</span>map(<span style="color: #008800; font-weight: bold">lambda</span> e: e)
 
-df['some_new_col2'] = df.apply(lambda e: e['state'])
-</code></pre>
+df[<span style="background-color: #fff0f0">&#39;some_new_col2&#39;</span>] <span style="color: #333333">=</span> df<span style="color: #333333">.</span>apply(<span style="color: #008800; font-weight: bold">lambda</span> e: e[<span style="background-color: #fff0f0">&#39;state&#39;</span>])
+</pre></div>
+
 
             <p>Sometimes the new features may be depended on serveral other columns.</p>
 
-<pre><code class="language-python">df['some_new_col3'] = df[['state', 'name']].map(lambda e: " ".join(e))
-</code></pre>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">df[<span style="background-color: #fff0f0">&#39;some_new_col3&#39;</span>] <span style="color: #333333">=</span> df[[<span style="background-color: #fff0f0">&#39;state&#39;</span>, <span style="background-color: #fff0f0">&#39;name&#39;</span>]]<span style="color: #333333">.</span>map(<span style="color: #008800; font-weight: bold">lambda</span> e: <span style="background-color: #fff0f0">&quot; &quot;</span><span style="color: #333333">.</span>join(e))
+</pre></div>
+
 
             <h2 class="section-heading">Processing Data in Pipeline Style</h2>
 
             <p>In traditional machine applications, such as face recognition, it is consisting of serveral steps. First apply face calibration methods, then extract the features and then train the classifiers. Finally turn the data model into production usage. These can be viewed as the sequence of transformation over the faces data.</p>
 
             <p>Express this in a abstract way, this can be viewed as the following.</p>
-<pre><code class="language-python">f(g(h(df), arg1=a), arg2=b, arg3=c)
-</code></pre>
+
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">f(g(h(df), arg1<span style="color: #333333">=</span>a), arg2<span style="color: #333333">=</span>b, arg3<span style="color: #333333">=</span>c)
+</pre></div>
+
 
             <p>But it looks rather awkward, thanks to Pandas built-in pipe method, we can simply write code as following.</p>
-<pre><code class="language-python">df.pipe(h) \
-  .pipe(g, arg1=a) \
-  .pipe(f, arg2=b, arg3=c)
-</code></pre>
+
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">df<span style="color: #333333">.</span>pipe(h) \
+  <span style="color: #333333">.</span>pipe(g, arg1<span style="color: #333333">=</span>a) \
+  <span style="color: #333333">.</span>pipe(f, arg2<span style="color: #333333">=</span>b, arg3<span style="color: #333333">=</span>c)
+</pre></div>
+
 
             <p>The f, g, h refered above can be functions, lambda expression or even class. In a lot of application I developed, I am in favor of class. Because it can offer more flexibility in controlling the behavior of the operators in the pipeline. But how can a class work like a function? That is Simple, use the Python magic function.</p>
 
-<pre><code class="language-python">class SomeMagicFunction: \
-      def __init__(self, *args, **kwargs):
-            self.args = args
-            self.kwargs = kwargs
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-weight: bold">class</span> <span style="color: #BB0066; font-weight: bold">SomeMagicFunction</span>:
+      <span style="color: #008800; font-weight: bold">def</span> <span style="color: #0066BB; font-weight: bold">__init__</span>(<span style="color: #007020">self</span>, <span style="color: #333333">*</span>args, <span style="color: #333333">**</span>kwargs):
+            <span style="color: #007020">self</span><span style="color: #333333">.</span>args <span style="color: #333333">=</span> args
+            <span style="color: #007020">self</span><span style="color: #333333">.</span>kwargs <span style="color: #333333">=</span> kwargs
 
-      def __call__(self, *args, **kwargs):
-            print("do some thing magic with {} and {}".format(self.args, self.kwargs))
-</code></pre>
+      <span style="color: #008800; font-weight: bold">def</span> <span style="color: #0066BB; font-weight: bold">__call__</span>(<span style="color: #007020">self</span>, <span style="color: #333333">*</span>args, <span style="color: #333333">**</span>kwargs):
+            <span style="color: #008800; font-weight: bold">print</span>(<span style="background-color: #fff0f0">&quot;do some thing magic with {} and {}&quot;</span><span style="color: #333333">.</span>format(<span style="color: #007020">self</span><span style="color: #333333">.</span>args, <span style="color: #007020">self</span><span style="color: #333333">.</span>kwargs))
+</pre></div>
+
 
             <p>A more realistic one is like the following.</p>
- <pre><code class="language-python">df.pipe(DimensionReduction('iso', to_col='dimension_reduced'), conf=conf, status=status) \
-  .pipe(RiskScoreCalculator("knn", from_col='dimension_reduced', to_col='abnormal_score'), conf=conf, status=status) \
-  .pipe(NormalizeAbnormalScore(from_col='abnormal_score', to_col='abnormal_score_normalize'), conf=conf, status=status) \
-  .pipe(UpdateLabel(0), conf=conf, status=status) \
-  .pipe(UpdateDescription(0), conf=conf, status=status) \
-  .pipe(UpdateToRedis(start_time, end_time), conf=conf, status=status) \
-  .pipe(UpdateImportance(data_manager.current_batch_json), conf=conf, status=status) \
-  .pipe(UpdateToES(data_manager.current_batch_json), conf=conf, status=status)
-</code></pre>           
+            
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">df<span style="color: #333333">.</span>pipe(DimensionReduction(<span style="background-color: #fff0f0">&#39;iso&#39;</span>, to_col<span style="color: #333333">=</span><span style="background-color: #fff0f0">&#39;dimension_reduced&#39;</span>), conf<span style="color: #333333">=</span>conf, status<span style="color: #333333">=</span>status) \
+  <span style="color: #333333">.</span>pipe(RiskScoreCalculator(<span style="background-color: #fff0f0">&quot;knn&quot;</span>, from_col<span style="color: #333333">=</span><span style="background-color: #fff0f0">&#39;dimension_reduced&#39;</span>, to_col<span style="color: #333333">=</span><span style="background-color: #fff0f0">&#39;abnormal_score&#39;</span>), conf<span style="color: #333333">=</span>conf, status<span style="color: #333333">=</span>status) \
+  <span style="color: #333333">.</span>pipe(NormalizeAbnormalScore(from_col<span style="color: #333333">=</span><span style="background-color: #fff0f0">&#39;abnormal_score&#39;</span>, to_col<span style="color: #333333">=</span><span style="background-color: #fff0f0">&#39;abnormal_score_normalize&#39;</span>), conf<span style="color: #333333">=</span>conf, status<span style="color: #333333">=</span>status) \
+  <span style="color: #333333">.</span>pipe(UpdateLabel(<span style="color: #0000DD; font-weight: bold">0</span>), conf<span style="color: #333333">=</span>conf, status<span style="color: #333333">=</span>status) \
+  <span style="color: #333333">.</span>pipe(UpdateDescription(<span style="color: #0000DD; font-weight: bold">0</span>), conf<span style="color: #333333">=</span>conf, status<span style="color: #333333">=</span>status) \
+  <span style="color: #333333">.</span>pipe(UpdateToRedis(start_time, end_time), conf<span style="color: #333333">=</span>conf, status<span style="color: #333333">=</span>status) \
+  <span style="color: #333333">.</span>pipe(UpdateImportance(data_manager<span style="color: #333333">.</span>current_batch_json), conf<span style="color: #333333">=</span>conf, status<span style="color: #333333">=</span>status) \
+  <span style="color: #333333">.</span>pipe(UpdateToES(data_manager<span style="color: #333333">.</span>current_batch_json), conf<span style="color: #333333">=</span>conf, status<span style="color: #333333">=</span>status)
+</pre></div>
+          
             <p>DimensionReduction, RiskScoreCalculator, NormalizeAbnormalScore, UpdateLabel, UpdateDescription will apply new columns to the dataframe according to its own function. UpdateToRedis, UpdateImportance, UpdateToES will update the enriched result into databases for downstream systems to process the data. The conf and status is dictionary value in python. We assume that conf should never be applied with write methods, and each operator in the pipeline can only write small amount of data in status as a message queue. This actually uses Python dictionary side effect(dictionary is passed by reference not value) and should be taken carefully.</p>
 
             <h2 class="section-heading">Scale to Large Dataset</h2>
@@ -166,25 +176,26 @@ df['some_new_col2'] = df.apply(lambda e: e['state'])
             <p>Parallel computing can be categorised into three kinds: data parallel, task parallel and mixed mode.
             For processing the dataframe, it is obvious that data parallel should be easy. By applying MapReduce methodology, data can be chunked into pieces and processed seperatedly and combine these together. We only need to implement column based enrichment operation and parallel aggregate. These are mostly needed.</p>
 
- <pre><code class="language-python">import multiprocessing as mp
-import pandas as pd
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-weight: bold">import</span> <span style="color: #0e84b5; font-weight: bold">multiprocessing</span> <span style="color: #008800; font-weight: bold">as</span> <span style="color: #0e84b5; font-weight: bold">mp</span>
+<span style="color: #008800; font-weight: bold">import</span> <span style="color: #0e84b5; font-weight: bold">pandas</span> <span style="color: #008800; font-weight: bold">as</span> <span style="color: #0e84b5; font-weight: bold">pd</span>
 
-def parallel_runner(fn, *args, **kwargs):
-    data = args[0]
-    data_chunks = split_strategy(data)(data)
-    with mp.Pool() as pool:
-        results = pool.starmap(partial(fn, **kwargs),
-                               ((i,) + args[1:] for i in data_chunks))
-    return pd.concat(results).reset_index(drop=True)
-</code></pre>  
+<span style="color: #008800; font-weight: bold">def</span> <span style="color: #0066BB; font-weight: bold">parallel_runner</span>(fn, <span style="color: #333333">*</span>args, <span style="color: #333333">**</span>kwargs):
+    data <span style="color: #333333">=</span> args[<span style="color: #0000DD; font-weight: bold">0</span>]
+    data_chunks <span style="color: #333333">=</span> split_strategy(data)(data)
+    <span style="color: #008800; font-weight: bold">with</span> mp<span style="color: #333333">.</span>Pool() <span style="color: #008800; font-weight: bold">as</span> pool:
+        results <span style="color: #333333">=</span> pool<span style="color: #333333">.</span>starmap(partial(fn, <span style="color: #333333">**</span>kwargs),
+                               ((i,) <span style="color: #333333">+</span> args[<span style="color: #0000DD; font-weight: bold">1</span>:] <span style="color: #008800; font-weight: bold">for</span> i <span style="color: #000000; font-weight: bold">in</span> data_chunks))
+    <span style="color: #008800; font-weight: bold">return</span> pd<span style="color: #333333">.</span>concat(results)<span style="color: #333333">.</span>reset_index(drop<span style="color: #333333">=</span><span style="color: #007020">True</span>)
+</pre></div>
+
 
             <p>The split_strategy is ignored here. It can be customised with fixed size or fixed chunk count etc. Partial function is used here, acting as some kind of trick, as the <b>starmap</b> function of multiprocessing pool does not support key word arguments. The first argument of the parameter <b>args</b> should always be the dataframe to be processed. And the parallel aggregatition is as following, the reader should not be much supprised. The dfGrouped is grouped-by object of the processed dataframe.</p>
 
- <pre><code class="language-python">def parallel_aggregate(dfGrouped, func):
-    with mp.Pool() as pool:
-        ret_list = pool.starmap(func, ((name, group) for name, group in dfGrouped))
-    return pd.concat(ret_list)
-</code></pre>  
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-weight: bold">def</span> <span style="color: #0066BB; font-weight: bold">parallel_aggregate</span>(dfGrouped, func):
+    <span style="color: #008800; font-weight: bold">with</span> mp<span style="color: #333333">.</span>Pool() <span style="color: #008800; font-weight: bold">as</span> pool:
+        ret_list <span style="color: #333333">=</span> pool<span style="color: #333333">.</span>starmap(func, ((name, group) <span style="color: #008800; font-weight: bold">for</span> name, group <span style="color: #000000; font-weight: bold">in</span> dfGrouped))
+    <span style="color: #008800; font-weight: bold">return</span> pd<span style="color: #333333">.</span>concat(ret_list)
+</pre></div>
 
             <p>Hopefully, from this blog, data pipeline designing is cleard and simplified with Pandas.</p>
 
