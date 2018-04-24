@@ -58,10 +58,10 @@
         <div class="row">
           <div class="col-lg-8 col-md-10 mx-auto">
             <div class="post-heading">
-              <h1>Custom gridsearch sklearn with arbitrary length of parameters</h1>
+              <h1>Custom sklearn gridsearch to deal with arbitrary length of parameters</h1>
               <span class="meta">Posted by
                 <a href="#">J.J. Young</a>
-                on Jan 8, 2017</span>
+                on Jan 10, 2017</span>
             </div>
           </div>
         </div>
@@ -73,49 +73,169 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-8 col-md-10 mx-auto">
-            <p>To build a data processing pipeline, we need to answer the following problem:</p>
+            <p>In machine learning, there is one question that can not be avoided - tuning the parameters. There have been numerous way of tuning parameters, mostly they root in following catageries. e.g. gradient based methods, sampling methods and varational methods. Some other approaches such as herustics optimaztion or dynamic programming are excluded. All of these can be viewed as kinds of optimazation solving methods. Someone might think that sampling methods are just doing things like estimating the density of distribution, but actually sampling methods go much beyond that, it has close relation with EM and has some physical interpretation such annelling methods. Since hyperparameter is the main focus of this article. We will disscuss it in a seperate blog.</p>
 
-            <p>
-              <ul>
-                <li>First, what is the format of the data?</li>
-                <li>Second, what operation will be performed on the data?</li>
-                <li>Thirdly, what is pipeline and how to excute a pipeline?</li>
-                <li>At last, how to scale to large dataset?</li>
-              </ul>
-            </p>
+            <h2 class="section-heading">Hyperparameter - a Bird Eye View</h2>
 
-            <p>For those who have seen the Earth from space, and for the hundreds and perhaps thousands more who will, the experience most certainly changes your perspective. The things that we share in our world are far more valuable than those which divide us.</p>
+            <p>When talking about hyperparameter, there is a full literature of reseach and study on this. The hyperparameter itself can be viewed as samples from a certain distubtion over some space, it can influence the shape of decision boundary. Though I encounter a lot of people stating that hyperparaters can not be optimised，otherwise you will need hyper-hyperparameters. But when we look at the minds of people, suppose a person is looking at a tree. He can actually realize that he is looking at a tree. Furthermore, he can even realize that he has realized he is looking at the tree. He can not only make two stage realization but in a infinate loop style. This is some kind of recussive structure and self-reference. Thus why not we can has a alogrithm that can learn from the world and optimise its intrisinc hyperparameters in a recursive and self-reference manner? This is beyond the scope of this blog, now we will focus on a very early stage of how to automatically tuning the hyperparameter, the answer is naive and easy, just to grid search over the entire space.</p>
 
-            <h2 class="section-heading">Pandas - a Short Introduction</h2>
+            <h2 class="section-heading">Grid Search with Sklearn</h2>
 
-            <p>There can be no thought of finishing for ‘aiming for the stars.’ Both figuratively and literally, it is a task to occupy the generations. And no matter how much progress one makes, there is always the thrill of just beginning.</p>
+            <p>For data scientist using Python, sklearn is one of the most popular tool of doing machine learning tasks and grid search method has been implemented in it. There is a nice <a href="http://danielhnyk.cz/creating-your-own-estimator-scikit-learn/">blog</a> that shows how to implement a customized estimator in sklearn and tells us how to automatically tune the parameter with grid search for your customized estimator. This article is very helpful to build your own customized estimator that can utilizing the grid search function provided by sklearn. But sometimes in some cases I encountered, the parameter I want to tune is from a json file. This json file has a lot information that contains your bussiness functionality. So can we use a generic way to parse the json into parameters and thus use grid search? The gap is that the parameters you want to tune must be already declared in the init method of your customized estimator and has exactly the same name as init function parameters as well as the parameters used by the estimator. To bridge the gap, following methods is used.</p>
 
-            <p>There can be no thought of finishing for ‘aiming for the stars.’ Both figuratively and literally, it is a task to occupy the generations. And no matter how much progress one makes, there is always the thrill of just beginning.</p>
 
-            <blockquote class="blockquote">The dreams of yesterday are the hopes of today and the reality of tomorrow. Science has not yet mastered prophecy. We predict too much for the next year and yet far too little for the next ten.</blockquote>
+<!-- HTML generated using hilite.me --><div style="background: #272822; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #66d9ef">def</span> <span style="color: #a6e22e">fit</span><span style="color: #f8f8f2">(self,</span> <span style="color: #f8f8f2">X,</span> <span style="color: #f8f8f2">y</span><span style="color: #f92672">=</span><span style="color: #66d9ef">None</span><span style="color: #f8f8f2">):</span>
+    <span style="color: #f8f8f2">self</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">threshold_</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">self</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">status</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">get(</span><span style="color: #e6db74">&#39;threshold&#39;</span><span style="color: #f8f8f2">,</span> <span style="color: #ae81ff">0</span><span style="color: #f8f8f2">)</span>
+    <span style="color: #66d9ef">return</span> <span style="color: #f8f8f2">self</span>
 
-            <p>Spaceflights cannot be stopped. This is not the work of any one man or even a group of men. It is a historical process which mankind is carrying out in accordance with the natural laws of human development.</p>
 
-            <h2 class="section-heading">Processing Data in Pipeline Style</h2>
+<span style="color: #66d9ef">def</span> <span style="color: #a6e22e">_meaning</span><span style="color: #f8f8f2">(self,</span> <span style="color: #f8f8f2">x):</span>
+    <span style="color: #66d9ef">return</span> <span style="color: #66d9ef">True</span> <span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">x</span> <span style="color: #f92672">&gt;=</span> <span style="color: #f8f8f2">self</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">treshold_</span> <span style="color: #66d9ef">else</span> <span style="color: #66d9ef">False</span>
 
-            <p>As we got further and further away, it [the Earth] diminished in size. Finally it shrank to the size of a marble, the most beautiful you can imagine. That beautiful, warm, living object looked so fragile, so delicate, that if you touched it with a finger it would crumble and fall apart. Seeing this has to change a man.</p>
 
-            <a href="#">
-              <img class="img-fluid" src="../img/post-sample-image.jpg" alt="">
-            </a>
-            <span class="caption text-muted">To go places and do things that have never been done before – that’s what living is all about.</span>
+<span style="color: #66d9ef">def</span> <span style="color: #a6e22e">predict</span><span style="color: #f8f8f2">(self,</span> <span style="color: #f8f8f2">X,</span> <span style="color: #f8f8f2">y</span><span style="color: #f92672">=</span><span style="color: #66d9ef">None</span><span style="color: #f8f8f2">):</span>
+    <span style="color: #66d9ef">try</span><span style="color: #f8f8f2">:</span>
+        <span style="color: #f8f8f2">getattr(self,</span> <span style="color: #e6db74">&quot;threshold_&quot;</span><span style="color: #f8f8f2">)</span>
+    <span style="color: #66d9ef">except</span> <span style="color: #a6e22e">AttributeError</span><span style="color: #f8f8f2">:</span>
+        <span style="color: #66d9ef">raise</span> <span style="color: #a6e22e">RuntimeError</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&quot;You must train classifer before predicting data!&quot;</span><span style="color: #f8f8f2">)</span>
+    <span style="color: #66d9ef">return</span> <span style="color: #f8f8f2">[self</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">_meaning(x)</span> <span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">x</span> <span style="color: #f92672">in</span> <span style="color: #f8f8f2">X]</span>
 
-            <p>Space, the final frontier. These are the voyages of the Starship Enterprise. Its five-year mission: to explore strange new worlds, to seek out new life and new civilizations, to boldly go where no man has gone before.</p>
 
-            <p>As I stand out here in the wonders of the unknown at Hadley, I sort of realize there’s a fundamental truth to our nature, Man must explore, and this is exploration at its greatest.</p>
+<span style="color: #66d9ef">def</span> <span style="color: #a6e22e">score</span><span style="color: #f8f8f2">(self,</span> <span style="color: #f8f8f2">X,</span> <span style="color: #f8f8f2">y</span><span style="color: #f92672">=</span><span style="color: #66d9ef">None</span><span style="color: #f8f8f2">):</span>
+    <span style="color: #66d9ef">return</span> <span style="color: #f8f8f2">sum(self</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">predict(X))</span>
 
-            <p>Placeholder text by
-              <a href="http://spaceipsum.com/">Space Ipsum</a>. Photographs by
-              <a href="https://www.flickr.com/photos/nasacommons/">NASA on The Commons</a>.</p>
 
-            <h2 class="section-heading">Scale to Large Dataset</h2>
+<span style="color: #f8f8f2">function_template</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;&quot;&quot;</span>
+<span style="color: #e6db74">def {function_name}(self, {arguments}):</span>
+<span style="color: #e6db74">    args, _, _, values = inspect.getargvalues(inspect.currentframe())</span>
+<span style="color: #e6db74">    values.pop(&quot;self&quot;)</span>
+<span style="color: #e6db74">    for arg, val in values.items():</span>
+<span style="color: #e6db74">        setattr(self, arg, val)</span>
+<span style="color: #e6db74">    self.conf_parser = MLConfParser()</span>
+<span style="color: #e6db74">&quot;&quot;&quot;</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">strip()</span>
 
-            <p>As we got further and further away, it [the Earth] diminished in size. Finally it shrank to the size of a marble, the most beautiful you can imagine. That beautiful, warm, living object looked so fragile, so delicate, that if you touched it with a finger it would crumble and fall apart. Seeing this has to change a man.</p>
+
+<span style="color: #66d9ef">def</span> <span style="color: #a6e22e">create_constructor</span><span style="color: #f8f8f2">(config_parser,</span> <span style="color: #f8f8f2">func_name</span><span style="color: #f92672">=</span><span style="color: #e6db74">&#39;init_constructor&#39;</span><span style="color: #f8f8f2">):</span>
+    <span style="color: #f8f8f2">exec(function_template</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">format(function_name</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">func_name,</span> <span style="color: #f8f8f2">arguments</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">config_parser</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">get_params_str()))</span>
+    <span style="color: #66d9ef">return</span> <span style="color: #f8f8f2">locals()[func_name]</span>
+
+
+<span style="color: #f8f8f2">GenericInitClassifier</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">type(</span><span style="color: #e6db74">&quot;GenericInitClassifier&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">(BaseEstimator,</span> <span style="color: #f8f8f2">ClassifierMixin),</span> <span style="color: #f8f8f2">{</span>
+    <span style="color: #e6db74">&quot;status&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #f8f8f2">{},</span>
+    <span style="color: #e6db74">&quot;fit&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #f8f8f2">fit,</span>
+    <span style="color: #e6db74">&quot;_meaning&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #f8f8f2">_meaning,</span>
+    <span style="color: #e6db74">&quot;__init__&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #f8f8f2">create_constructor(MLConfParser()),</span>
+    <span style="color: #e6db74">&quot;predict&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #f8f8f2">predict,</span>
+    <span style="color: #e6db74">&quot;score&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #f8f8f2">score</span>
+<span style="color: #f8f8f2">})</span>
+</pre></td></tr></table></div>
+
+
+            <p>As you can see from above, the most important difference between this methods and the one in the recommended blog is that here it used type methods and eval methods to generate the estimator class. There are two reasons, first because the bussiness related json will be translated into init parameter by <b>MLConfParser</b>. <b>MLConfParser</b> will handle translate json into init parameter and vise vesa. Second, <b>type</b> method is used because it tries to minimize the scope eval method. Though eval may seems unavoidable, if you want to custom init with arbitrary json. In some sense, we have realized that create a estimator with arbitary length of parameter that still can utilize grid search provided by sklearn.</p>
+
+            <h2 class="section-heading">Last Few Words</h2>
+
+            <p>At last we almost finish our story, to actully put above into use, we can create a real class that inheritate from above and realize the methods such as train and predict. <b>FeatureNormalizer</b> is class that wrapps transforming the parameters back into bussiness related json. This finished our story here.</p>
+
+<!-- HTML generated using hilite.me --><div style="background: #272822; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #66d9ef">class</span> <span style="color: #a6e22e">YourClassifier</span><span style="color: #f8f8f2">(GenericInitClassifier):</span>
+    <span style="color: #f8f8f2">normalizer</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">None</span>
+    <span style="color: #f8f8f2">prediction</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">None</span>
+    <span style="color: #f8f8f2">train_data</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">None</span>
+    <span style="color: #f8f8f2">predict_data</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">None</span>
+    <span style="color: #f8f8f2">conf_parser</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">None</span>
+
+    <span style="color: #66d9ef">def</span> <span style="color: #a6e22e">parse_kv_conf</span><span style="color: #f8f8f2">(self,</span> <span style="color: #f8f8f2">kv_conf</span><span style="color: #f92672">=</span><span style="color: #66d9ef">None</span><span style="color: #f8f8f2">):</span>
+        <span style="color: #66d9ef">return</span> <span style="color: #f8f8f2">self</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">conf_parser</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">get_norm_conf(kv_conf</span> <span style="color: #f92672">or</span> <span style="color: #f8f8f2">self</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">__dict__)</span>
+
+    <span style="color: #66d9ef">def</span> <span style="color: #a6e22e">fit</span><span style="color: #f8f8f2">(self,</span> <span style="color: #f8f8f2">X,</span> <span style="color: #f8f8f2">y</span><span style="color: #f92672">=</span><span style="color: #66d9ef">None</span><span style="color: #f8f8f2">):</span>
+        <span style="color: #f8f8f2">self</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">normalizer</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">FeatureNormalizer(self</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">parse_kv_conf())</span>
+        <span style="color: #f8f8f2">self</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">train_data</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">X</span>
+        <span style="color: #66d9ef">return</span> <span style="color: #f8f8f2">self</span>
+
+    <span style="color: #66d9ef">def</span> <span style="color: #a6e22e">predict</span><span style="color: #f8f8f2">(self,</span> <span style="color: #f8f8f2">X):</span>
+        <span style="color: #f8f8f2">conf</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">{}</span>
+        <span style="color: #f8f8f2">status</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">{}</span>
+
+        <span style="color: #f8f8f2">self</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">prediction</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">self</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">predict_data</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">pipe(self</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">normalizer)</span> \
+            <span style="color: #f92672">.</span><span style="color: #f8f8f2">pipe(PredictByScore(),</span> <span style="color: #f8f8f2">status</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">status)</span>
+            <span style="color: #f92672">.</span><span style="color: #f8f8f2">pipe(</span><span style="color: #66d9ef">lambda</span> <span style="color: #f8f8f2">df:</span> <span style="color: #f8f8f2">df[[</span><span style="color: #e6db74">&#39;id&#39;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&#39;prediction&#39;</span><span style="color: #f8f8f2">]]</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">set_index(</span><span style="color: #e6db74">&#39;id&#39;</span><span style="color: #f8f8f2">))</span>
+
+        <span style="color: #66d9ef">return</span> <span style="color: #f8f8f2">self</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">prediction</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">loc[X[</span><span style="color: #e6db74">&#39;id&#39;</span><span style="color: #f8f8f2">]][</span><span style="color: #e6db74">&#39;prediction&#39;</span><span style="color: #f8f8f2">]</span>
+
+    <span style="color: #66d9ef">def</span> <span style="color: #a6e22e">score</span><span style="color: #f8f8f2">(self,</span> <span style="color: #f8f8f2">X,</span> <span style="color: #f8f8f2">y</span><span style="color: #f92672">=</span><span style="color: #66d9ef">None</span><span style="color: #f8f8f2">):</span>
+        <span style="color: #66d9ef">return</span> <span style="color: #f8f8f2">f1_score(y,</span> <span style="color: #f8f8f2">self</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">predict(X))</span>
+</pre></td></tr></table></div>
+
+
           </div>
         </div>
       </div>
